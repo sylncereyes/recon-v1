@@ -24,13 +24,13 @@ curl -s "https://crt.sh/?q=%25.$DOMAIN&output=json" | jq -r '.[].name_value' 2>/
 curl -s "https://api.hackertarget.com/hostsearch/?q=$DOMAIN" | grep -o "\w.*$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
 curl -s "https://riddler.io/search/exportcsv?q=pld:$DOMAIN" | grep -Po "(([\w.-])\.([\w])\.([A-z]))\w+" | grep -o "\w.*$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
 curl -s https://certspotter.com/api/v0/certs\?domain\=$DOMAIN | jq '.[].dns_names[]' | sed 's/\"//g' | sed 's/\*\.//g' | sort -u | grep "$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
-shuffledns -silent -d "$DOMAIN" -w ~/wordlists/subdomains-top1million-5000.txt -r ~/wordlists/resolvers.txt -mode bruteforce | anew subdomains.txt >> "$LOGFILE"
+shuffledns -silent -d "$DOMAIN" -w ~/.wordlists/subdomains-top1million-5000.txt -r ~/.wordlists/resolvers.txt -mode bruteforce | anew subdomains.txt >> "$LOGFILE"
 sleep 2
 clear
 
 ## DNS Enumeration
 echo "### DNS Resolution - Resolve Discovered Subdomains" | tee -a "$LOGFILE"
-puredns resolve subdomains.txt -r ~/wordlists/resolvers.txt -w resolved.txt 2>> "$LOGFILE"
+puredns resolve subdomains.txt -r ~/.wordlists/resolvers.txt -w resolved.txt 2>> "$LOGFILE"
 dnsx -l resolved.txt -silent -json -o dns.json | jq -r '.a?[]?' | anew ips.txt >> "$LOGFILE"
 dnsx -l subdomains.txt -silent -json -o dns2.json | jq -r '.a?[]?' | anew ips.txt >> "$LOGFILE"
 sleep 2
