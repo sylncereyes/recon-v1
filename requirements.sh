@@ -61,6 +61,7 @@ go install github.com/lc/gau/v2/cmd/gau@latest
 go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
 go install github.com/1ndianl33t/Gf@latest
 go install github.com/eq4/qsreplace@latest
+go install -v github.com/tomnomnom/anew@latest
 mv /go/bin/* /usr/local/bin/
 
 # Mengunduh wordlists (subdomain, resolvers, dan lainnya)
@@ -89,14 +90,10 @@ echo "Mengunduh template Nuclei..."
 git clone https://github.com/projectdiscovery/nuclei-templates.git ~/nuclei-templates
 
 # Mengunduh tools pendukung
-mkdir -p ~/.tools
-cd ~/.tools
-git clone https://github.com/gotr00t0day/Techackz.git
-cd TechackZ
-pip install -r requirements.txt
-chmod +x install.sh
-./install.sh
 searchsploit -update
+cd
+mkdir -p .config/haktools
+touch .config/haktools/haktrails-config.yml
 
 # Periksa apakah git telah terinstal
 if ! command -v git &> /dev/null; then
