@@ -23,6 +23,7 @@ echo "$DOMAIN" | haktrails subdomains | anew subdomains.txt >> "$LOGFILE"
 curl -s "https://crt.sh/?q=%25.$DOMAIN&output=json" | jq -r '.[].name_value' 2>/dev/null | sed 's/\\.//g' | sort -u | grep -o "\w.$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
 curl -s "https://api.hackertarget.com/hostsearch/?q=$DOMAIN" | grep -o "\w.*$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
 curl -s "https://riddler.io/search/exportcsv?q=pld:$DOMAIN" | grep -Po "(([\w.-])\.([\w])\.([A-z]))\w+" | grep -o "\w.*$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
+curl -s https://certspotter.com/api/v0/certs\?domain\=$DOMAIN | jq '.[].dns_names[]' | sed 's/\"//g' | sed 's/\*\.//g' | sort -u | grep "$DOMAIN" | anew subdomains.txt >> "$LOGFILE"
 shuffledns -silent -d "$DOMAIN" -w ~/wordlists/subdomains-top1million-5000.txt -r ~/wordlists/resolvers.txt -mode bruteforce | anew subdomains.txt >> "$LOGFILE"
 sleep 2
 clear
@@ -104,7 +105,6 @@ nuclei -silent -l hosts.txt -t ~/nuclei-templates/http/vulnerabilities/generic/g
 cat jsFiles.txt | nuclei -silent -t ~/nuclei-templates/http/exposures/ -c 30 -o vulns/exposure >> "$LOGFILE"
 cat endpoints.txt | nuclei -silent -es info,low -c 50 -t ~/nuclei-templates/dast/vulnerabilities/ -dast -o vulns/dast >> "$LOGFILE"
 cat parameters.txt | nuclei -silent -es info,low -c 50 -t ~/nuclei-templates/dast/vulnerabilities/ -dast -o vulns/params_dast >> "$LOGFILE"
-cat parameters.txt | grep "?" | qsreplace ../../../../etc/passwd | ffuf -u 'FUZZ' -w - -mr '^root:' -c -mc 200 -o vulns/lfi >> "$LOGFILE"
 sleep 2
 clear
 
