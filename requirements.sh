@@ -15,7 +15,7 @@ apt-get update && apt-get upgrade -y
 
 # Instalasi alat dasar
 echo "Menginstal dependensi dasar..."
-apt-get install -y \
+apt install -y \
     golang-go \
     git \
     wget \
@@ -23,6 +23,7 @@ apt-get install -y \
     jq \
     nmap \
     whatweb \
+    exploitdb \
     ffuf \
     dnsutils \
     python3-pip \
@@ -36,8 +37,8 @@ echo "Menginstal Go tools..."
 # Pastikan Go terinstal
 if ! command -v go &> /dev/null; then
     echo "Go tidak ditemukan, menginstal Go..."
-    wget https://golang.org/dl/go1.19.7.linux-amd64.tar.gz
-    tar -C /usr/local -xvzf go1.19.7.linux-amd64.tar.gz
+    wget https://go.dev/dl/go1.23.4.linux-amd64.tar.gz
+    tar -C /usr/local -xvzf go1.23.4.linux-amd64.tar.gz
     export PATH=$PATH:/usr/local/go/bin
     echo "Go berhasil diinstal."
 else
@@ -60,19 +61,42 @@ go install github.com/lc/gau/v2/cmd/gau@latest
 go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
 go install github.com/1ndianl33t/Gf@latest
 go install github.com/eq4/qsreplace@latest
+mv /go/bin/* /usr/local/bin/
 
 # Mengunduh wordlists (subdomain, resolvers, dan lainnya)
 echo "Mengunduh wordlists..."
-mkdir -p ~/wordlists
-cd ~/wordlists
+mkdir -p ~/.wordlists
+cd ~/.wordlists
 
 # Unduh wordlist subdomains dan resolvers
 wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt
 wget https://raw.githubusercontent.com/bigb0x/dns-resolvers/master/resolvers.txt
+wget https://raw.githubusercontent.com/gotr00t0day/spyhunt/refs/heads/main/payloads/api-endpoints.txt
+wget https://raw.githubusercontent.com/gotr00t0day/spyhunt/refs/heads/main/payloads/bypasses.txt
+wget https://raw.githubusercontent.com/gotr00t0day/spyhunt/refs/heads/main/payloads/traversal.txt
+wget https://raw.githubusercontent.com/coffinxp/loxs/refs/heads/main/payloads/xsspollygots.txt
+wget https://raw.githubusercontent.com/coffinxp/loxs/refs/heads/main/payloads/or.txt
+wget https://raw.githubusercontent.com/gotr00t0day/spyhunt/refs/heads/main/payloads/xss.txt
+mkdir -p files_xss
+cd files_xss
+wget https://raw.githubusercontent.com/coffinxp/loxs/refs/heads/main/payloads/xss.txt
+cat xss.txt | anew -q ../xss.txt
+rm -rf xss.txt
 
 # Mengunduh template Nuclei
+cd
 echo "Mengunduh template Nuclei..."
 git clone https://github.com/projectdiscovery/nuclei-templates.git ~/nuclei-templates
+
+# Mengunduh tools pendukung
+mkdir -p ~/.tools
+cd ~/.tools
+git clone https://github.com/gotr00t0day/Techackz.git
+cd TechackZ
+pip install -r requirements.txt
+chmod +x install.sh
+./install.sh
+searchsploit -update
 
 # Periksa apakah git telah terinstal
 if ! command -v git &> /dev/null; then
